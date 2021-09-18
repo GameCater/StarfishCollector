@@ -15,6 +15,8 @@ import com.badlogic.gdx.utils.Array;
  */
 public class AnimationUtils {
 	
+	public static final String TAG = AnimationUtils.class.getName();
+	
 	private AnimationUtils() {}
 	
 	/**
@@ -45,13 +47,13 @@ public class AnimationUtils {
 		else
 			animation.setPlayMode(PlayMode.NORMAL);
 		
-		Gdx.app.log(null, "成功加载");
+		Gdx.app.log(TAG, "成功加载：" + fileNames[0] + "...");
 		
 		return animation;
 	}
 	
 	/**
-	 * 从一整张图片（类似纹理集）生成动画，支持4行以上的sheet
+	 * 从一整张图片（类似纹理集）生成动画
 	 * @param sheetName
 	 * @param rows
 	 * @param cols
@@ -60,7 +62,7 @@ public class AnimationUtils {
 	 * @return
 	 */
 	public static Animation<TextureRegion> loadAnimationFromSheet(String sheetName, 
-			int rows, int cols, float frameDuration, boolean loop){
+			int rows, int cols, float frameDuration, boolean loop, int row){
 		Texture texture = new Texture(Gdx.files.internal(sheetName));
 		texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		int frameWidth = texture.getWidth() / cols;
@@ -69,9 +71,15 @@ public class AnimationUtils {
 		TextureRegion[][] temp = TextureRegion.split(texture, frameWidth, frameHeight);
 		Array<TextureRegion> textureArray = new Array<>();
 		
-		for (int i = 0; i < rows; i ++)
-			for (int j = 0; j < cols; j ++)
-				textureArray.add(temp[i][j]);
+		if (row == -1) {
+			for (int i = 0; i < rows; i ++)
+				for (int j = 0; j < cols; j ++)
+					textureArray.add(temp[i][j]);
+			}
+		else { // 选择某一行的帧动画
+			for (int i = 0; i < rows; i ++)
+				textureArray.add(temp[row][i]);
+		}
 		
 		Animation<TextureRegion> animation = new Animation<>(frameDuration, textureArray);
 		
@@ -80,7 +88,7 @@ public class AnimationUtils {
 		else
 			animation.setPlayMode(PlayMode.NORMAL);
 		
-		Gdx.app.log(null, "成功加载: " + sheetName);
+		Gdx.app.log(TAG, "成功加载: " + sheetName);
 		
 		return animation;
 	}
